@@ -2,7 +2,7 @@
 * @Author: lushijie
 * @Date:   2017-02-21 18:50:26
 * @Last Modified by:   lushijie
-* @Last Modified time: 2017-07-13 10:20:51
+* @Last Modified time: 2017-07-13 16:50:56
 */
 const helper = require('think-helper');
 const ARRAY_SP = '__array__';
@@ -151,11 +151,11 @@ class Validator {
    */
   _parseValidArgs(validName, rule) {
     let ruleArgs = rule[validName];
-    let pfn = preRules['_' + validName];
-    if(helper.isFunction(pfn)){
-      // support rewrite back, so just pass this.ctxQuery without clone
-      ruleArgs = pfn(ruleArgs, this.ctxQuery, validName);
-    }
+    // let pfn = preRules['_' + validName];
+    // if(helper.isFunction(pfn)){
+    //   // support rewrite back, so just pass this.ctxQuery without clone
+    //   ruleArgs = pfn(ruleArgs, this.ctxQuery, validName);
+    // }
     return ruleArgs;
   }
 
@@ -193,8 +193,8 @@ class Validator {
       let validName = this.requiredValidNames[i];
       if(rule[validName]) {
         let fn = preRules[validName];
-        let parsedValidArgs = this._parseValidArgs(validName, rule);
-        if(fn(rule.value, parsedValidArgs, validName, this.ctxQuery)) {
+        //let parsedValidArgs = this._parseValidArgs(validName, rule);
+        if(fn(rule.value, rule[validName], validName, this.ctxQuery)) {
           isRequired = true;
           break;
         };
@@ -351,7 +351,7 @@ class Validator {
           }
 
           let parsedValidArgs = this._parseValidArgs(validName, rule);
-          let errMsg = this._getErrorMessage(argName, rule, validName, parsedValidArgs);
+          let errMsg = this._getErrorMessage(argName, rule[validName], validName, parsedValidArgs);
           ret[argName] = errMsg;
           continue;
         }else {
@@ -374,7 +374,7 @@ class Validator {
         // get parsed valid options
         let parsedValidArgs = this._parseValidArgs(validName, rule);
 
-        let result = fn(rule.value, parsedValidArgs, validName, this.ctxQuery);
+        let result = fn(rule.value, rule[validName], validName, this.ctxQuery);
         if(!result){
           let errMsg = this._getErrorMessage(argName, rule, validName, parsedValidArgs);
 

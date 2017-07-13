@@ -2,7 +2,7 @@
 * @Author: lushijie
 * @Date:   2017-05-14 09:23:50
 * @Last Modified by:   lushijie
-* @Last Modified time: 2017-07-01 12:55:53
+* @Last Modified time: 2017-07-13 16:49:05
 */
 import test from 'ava';
 import helper from 'think-helper';
@@ -2708,18 +2708,18 @@ test('rule-ip-no-required', t => {
 test('rule-add-method', t => {
   let rules = {
     arg: {
-      default: 'lu',
+      default: 'lushijie',
       eqlushijie: true
     }
   }
   let wrongMsg = 'eqlushijie error';
 
   Validator.addRule('eqlushijie', function(value, parsedValue) {
-    return parsedValue === 'lushijie';
+    return value === 'lushijie';
   }, wrongMsg);
-  Validator.addRule('_eqlushijie', function(validValue, query) {
-    return query.arg + 'shijie';
-  });
+  // Validator.addRule('_eqlushijie', function(validValue, query) {
+  //   return query.arg + 'shijie';
+  // });
   let instance = new Validator(helper.extend({}, defaultCtx));
   let ret = instance.validate(rules);
   t.true(Object.keys(ret).length === 0);
