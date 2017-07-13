@@ -2,7 +2,7 @@
 * @Author: lushijie
 * @Date:   2017-02-21 18:50:26
 * @Last Modified by:   lushijie
-* @Last Modified time: 2017-07-01 11:06:11
+* @Last Modified time: 2017-07-13 10:20:51
 */
 const helper = require('think-helper');
 const ARRAY_SP = '__array__';
@@ -194,7 +194,7 @@ class Validator {
       if(rule[validName]) {
         let fn = preRules[validName];
         let parsedValidArgs = this._parseValidArgs(validName, rule);
-        if(fn(rule.value, parsedValidArgs)) {
+        if(fn(rule.value, parsedValidArgs, validName, this.ctxQuery)) {
           isRequired = true;
           break;
         };
@@ -374,7 +374,7 @@ class Validator {
         // get parsed valid options
         let parsedValidArgs = this._parseValidArgs(validName, rule);
 
-        let result = fn(rule.value, parsedValidArgs, validName);
+        let result = fn(rule.value, parsedValidArgs, validName, this.ctxQuery);
         if(!result){
           let errMsg = this._getErrorMessage(argName, rule, validName, parsedValidArgs);
 

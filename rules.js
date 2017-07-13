@@ -2,7 +2,7 @@
 * @Author: lushijie
 * @Date:   2017-02-27 19:11:47
 * @Last Modified by:   lushijie
-* @Last Modified time: 2017-07-01 12:54:17
+* @Last Modified time: 2017-07-13 10:29:33
 */
 'use strict';
 const helper = require('think-helper');
@@ -21,151 +21,107 @@ Rules.required = (value, validValue) => {
   return validValue;
 };
 
-/**
- * parse requiredIf rule validValue
- * @param  {Array}  validValue []
- * @param  {Object} query []
- * @return {Array}  []
- */
-Rules._requiredIf = (validValue, query) => {
-  assert(helper.isArray(validValue), 'requiredIf\'s value should be array');
-  validValue = validValue.slice();
-
-  // just parse the first param
-  //let arg0 = validValue[0];
-  //validValue[0] = !helper.isTrueEmpty(query[arg0]) ? query[arg0] : arg0;
-
-  validValue[0] = query[validValue[0]];
-  return validValue;
-};
 
 /**
  * The field under validation must be present if the otherFields field is equal to any value.
  * @param  {String}    value       [description]
- * @param  {Array}     parsedValue     [description]
+ * @param  {Array}     validValue     [description]
  * @return {Boolean}               [description]
  */
-Rules.requiredIf = (value, parsedValue) => {
-  let first = parsedValue[0];
-  let others = parsedValue.slice(1);
-  return others.indexOf(first) > -1;
+Rules.requiredIf = (value, validValue, validName, query) => {
+  assert(helper.isArray(validValue), 'requiredIf\'s value should be array');
+  validValue = validValue.slice();
+  validValue[0] = query[validValue[0]]; // just parse the first param
+  let others = validValue.slice(1);
+  return others.indexOf(validValue[0]) > -1;
 };
 
-/**
- * parse requiredNotIf rule validValue
- * @param  {Array} validValue      []
- * @param  {Object} query []
- * @return {Array}      []
- */
-Rules._requiredNotIf = (validValue, query) => {
-  assert(helper.isArray(validValue), 'requiredNotIf\'s value should be array');
-  return Rules._requiredIf(validValue, query);
-};
 
 /**
  * The field under validation must be present not if the otherFileds field is equal to any value.
  * @param  {String}    value        []
- * @param  {Array}     parsedValue       []
+ * @param  {Array}     validValue       []
  * @return {Boolean}                 []
  */
-Rules.requiredNotIf = (value, parsedValue) => {
-  let first = parsedValue[0];
-  let others = parsedValue.slice(1);
-  return (others.indexOf(first) === -1);
-};
-
-/**
- * parse required rule validValue
- * @param  {Array}  validValue []
- * @param  {Object} query []
- * @return {Array}      []
- */
-Rules._requiredWith = (validValue, query) => {
-  assert(helper.isArray(validValue), 'requiredWith\'s value should be array');
+Rules.requiredNotIf = (value, validValue, validName, query) => {
+  assert(helper.isArray(validValue), 'requiredNotIf\'s value should be array');
   validValue = validValue.slice();
+  validValue[0] = query[validValue[0]]; // just parse the first param
 
-  // parsed all the param
-  return validValue.map(item => {
-    return !helper.isTrueEmpty(query[item]) ? query[item] : '';
-  });
+  let others = validValue.slice(1);
+  return (others.indexOf(validValue[0]) === -1);
 };
 
 /**
  * The field under validation must be present only if any of the other specified fields are present.
  * @param  {String} value         []
- * @param  {Array}  parsedValue  []
+ * @param  {Array}  validValue  []
  * @return {Boolean}              []
  */
-Rules.requiredWith = (value, parsedValue) => {
+Rules.requiredWith = (value, validValue, validName, query) => {
+  assert(helper.isArray(validValue), 'requiredWith\'s value should be array');
+  validValue = validValue.slice();
+  let parsedValue = validValue.map(item => {
+    return !helper.isTrueEmpty(query[item]) ? query[item] : '';
+  });
+
   return parsedValue.some(item => {
     return !helper.isTrueEmpty(item);
   });
 };
 
-/**
- * parse requiredWithAll rule validValue
- * @param  {Array}  validValue []
- * @param  {Object} query []
- * @return {Array}      []
- */
-Rules._requiredWithAll = (validValue, query) => {
-  assert(helper.isArray(validValue), 'requiredWithAll\'s value should be array');
-  return Rules._requiredWith(validValue, query);
-};
 
 /**
  * The field under validation must be present only if all of the other specified fields are present.
  * @param  {String}    value         []
- * @param  {Array}     parsedValue       []
+ * @param  {Array}     validValue       []
  * @return {Boolean}                 []
  */
-Rules.requiredWithAll = (value, parsedValue) => {
+Rules.requiredWithAll = (value, validValue, validName, query) => {
+  assert(helper.isArray(validValue), 'requiredWithAll\'s value should be array');
+  validValue = validValue.slice();
+  let parsedValue = validValue.map(item => {
+    return !helper.isTrueEmpty(query[item]) ? query[item] : '';
+  });
+
   return parsedValue.every(item => {
     return !helper.isTrueEmpty(item);
   });
 };
 
-/**
- * parse requiredWithOut rule validValue
- * @param  {Array} validValue []
- * @param  {Object} query []
- * @return {Array}      []
- */
-Rules._requiredWithOut = (validValue, query) => {
-  assert(helper.isArray(validValue), 'requiredWithOut\'s value should be array');
-  return Rules._requiredWith(validValue, query);
-};
 
 /**
  * The field under validation must be present only when any of the other specified fields are not present.
  * @param  {String}    value          []
- * @param  {Array} parsedValue            []
+ * @param  {Array} validValue          []
  * @return {Boolean}                  []
  */
-Rules.requiredWithOut = (value, parsedValue) => {
+Rules.requiredWithOut = (value, validValue, validName, query) => {
+  assert(helper.isArray(validValue), 'requiredWithOut\'s value should be array');
+  validValue = validValue.slice();
+  let parsedValue = validValue.map(item => {
+    return !helper.isTrueEmpty(query[item]) ? query[item] : '';
+  });
+
   return parsedValue.some(item => {
     return helper.isTrueEmpty(item);
   });
 };
 
-/**
- * parse requiredWithOutAll rule validValue
- * @param  {Array} validValue []
- * @param  {Object} query []
- * @return {Array}      []
- */
-Rules._requiredWithOutAll = (validValue, query) => {
-  assert(helper.isArray(validValue), 'requiredWithOutAll\'s value should be array');
-  return Rules._requiredWith(validValue, query);
-};
 
 /**
  * The field under validation must be present only when all of the other specified fields are not present.
  * @param  {String}    value         []
- * @param  {Array}     parsedValue []
+ * @param  {Array}     validValue []
  * @return {Boolean}                  []
  */
-Rules.requiredWithOutAll = (value, parsedValue) => {
+Rules.requiredWithOutAll = (value, validValue, validName, query) => {
+  assert(helper.isArray(validValue), 'requiredWithOutAll\'s value should be array');
+  validValue = validValue.slice();
+  let parsedValue = validValue.map(item => {
+    return !helper.isTrueEmpty(query[item]) ? query[item] : '';
+  });
+
   return parsedValue.every(item => {
     return helper.isTrueEmpty(item);
   });
@@ -182,66 +138,28 @@ Rules.contains = (value, validValue) => {
   return validator.contains(value, validValue);
 };
 
-/**
- * parse equal rule validValue
- * @param  {String} validValue []
- * @param  {Object} query []
- * @return {String}      []
- */
-Rules._equals = (validValue, query) => {
-  return query[validValue];
-};
 
 /**
  * check if the string matches the parsedValue.
  * @param  {String} value      []
- * @param  {String} parsedValue []
+ * @param  {String} validValue []
  * @return {Boolean}            []
  */
-Rules.equals = (value, parsedValue) => {
+Rules.equals = (value, validValue, validName, query) => {
   value = validator.toString(value);
-  return validator.equals(value, parsedValue);
+  return validator.equals(value, query[validValue]);
 };
 
-/**
- * parse different rule validValue
- * @param  {Array}  validValue []
- * @param  {Object} query []
- * @return {Array}  []
- */
-Rules._different = (validValue, query) => {
-  return Rules._equals(validValue, query);
-};
 
 /**
  * check if the string not matches the parsedValue.
  * @param  {String} value      [description]
- * @param  {String} parsedValue [description]
+ * @param  {String} validValue [description]
  * @return {Boolean}            [description]
  */
-Rules.different = (value, parsedValue) => {
+Rules.different = (value, validValue, validName, query) => {
   value = validator.toString(value);
-  return !validator.equals(value, parsedValue);
-};
-
-/*
- * pretreat before rule validValue
- * @param  {Date String|true} validValue []
- * @return {Array}      []
-*/
-Rules._before = (validValue) => {
- if(validValue === true) {
-    let now = new Date();
-    let nowTime = now.getFullYear() + '-' +
-                  (now.getMonth() + 1) + '-' +
-                  now.getDate() + ' ' +
-                  now.getHours() + ':' +
-                  now.getMinutes() + ':' +
-                  now.getSeconds();
-    return nowTime;
-  }
-  assert(Rules.date(validValue), 'validValue should be date');
-  return validValue;
+  return !validator.equals(value, query[validValue]);
 };
 
 /*
@@ -250,18 +168,20 @@ Rules._before = (validValue) => {
  * @param  {Date String} parsedValue  []
  * @return {Boolean}       []
 */
-Rules.before = (value, parsedValue) => {
+Rules.before = (value, validValue) => {
   value = validator.toString(value);
-  return validator.isBefore(value, parsedValue);
-};
-
-/*
- * pretreat after rule validValue
- * @param  {Date String | true} validValue []
- * @return {Array}      []
-*/
-Rules._after = (validValue) => {
-  return Rules._before(validValue);
+  if(validValue === true) {
+     let now = new Date();
+     let nowTime = now.getFullYear() + '-' +
+                   (now.getMonth() + 1) + '-' +
+                   now.getDate() + ' ' +
+                   now.getHours() + ':' +
+                   now.getMinutes() + ':' +
+                   now.getSeconds();
+     validValue = nowTime;
+   }
+   assert(Rules.date(validValue), 'validValue should be date');
+  return validator.isBefore(value, validValue);
 };
 
 /*
@@ -270,9 +190,20 @@ Rules._after = (validValue) => {
  * @param  {Date String} parsedValue  []
  * @return {Boolean}       []
 */
-Rules.after = (value, parsedValue) => {
+Rules.after = (value, validValue) => {
   value = validator.toString(value);
-  return validator.isAfter(value, parsedValue);
+  if(validValue === true) {
+     let now = new Date();
+     let nowTime = now.getFullYear() + '-' +
+                   (now.getMonth() + 1) + '-' +
+                   now.getDate() + ' ' +
+                   now.getHours() + ':' +
+                   now.getMinutes() + ':' +
+                   now.getSeconds();
+     validValue = nowTime;
+   }
+   assert(Rules.date(validValue), 'validValue should be date');
+  return validator.isAfter(value, validValue);
 };
 
 /**
@@ -831,16 +762,6 @@ Rules.macAddress = value => {
   value = validator.toString(value);
   return validator.isMACAddress(value);
 };
-
-/**
- * check if the string contains only numbers.
- * @param  {String} value [description]
- * @return {Boolean}       [description]
- */
-// Rules.numeric = value => {
-//   value = validator.toString(value);
-//   return validator.isNumeric(value);
-// };
 
 /**
  * check if the string is a data uri format.
