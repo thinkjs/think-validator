@@ -20,8 +20,6 @@ const METHOD_MAP = {
 };
 const preRules = require('./rules.js');
 const preErrors = require('./errors.js');
-let isLoadConf = false;
-let confErrors = {};
 
 class Validator {
   constructor(ctx) {
