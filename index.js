@@ -20,6 +20,11 @@ const METHOD_MAP = {
 };
 const preRules = require('./rules.js');
 const preErrors = require('./errors.js');
+let confErrors = {};
+const confFilePath = think.APP_PATH + '/config/errors.js';
+if (helper.isFile(confFilePath)) {
+  confErrors = require(confFilePath);
+}
 
 class Validator {
   constructor(ctx) {
@@ -36,7 +41,7 @@ class Validator {
     ];
     this.skippedValidNames = ['value', 'default', 'trim', 'method', 'aliasName'].concat(this.requiredValidNames);
     this.basicType = ['int', 'string', 'float', 'array', 'object', 'boolean'];
-    this.errors = helper.extend({}, preErrors);
+    this.errors = helper.extend({}, preErrors, confErrors);
   }
 
   /**
@@ -200,17 +205,18 @@ class Validator {
         const fn = preRules[validName];
         const parsedValidValue = this._parseValidArgs(validName, rule, cloneRules);
         if (fn(rule.value, {
-          rule,
-          validName,
-          validValue: rule[validName],
-          parsedValidValue,
-          ctx: this.ctx,
-          currentQuery: this.ctxQuery,
-          rules: cloneRules // prevent to write
-        })) {
+            rule,
+            validName,
+            validValue: rule[validName],
+            parsedValidValue,
+            ctx: this.ctx,
+            currentQuery: this.ctxQuery,
+            rules: cloneRules // prevent to write
+          })) {
           isRequired = true;
           break;
-        };
+        }
+        ;
       }
     }
     return isRequired;
@@ -308,12 +314,12 @@ class Validator {
         if (rule.array) {
           for (let i = 0; i < ruleValue.length; i++) {
             const tmpRuleName = argName + ARRAY_SP + i;
-            childRules[tmpRuleName] = helper.extend({}, ruleChildren, {value: ruleValue[i]});
+            childRules[tmpRuleName] = helper.extend({}, ruleChildren, { value: ruleValue[i] });
           }
         } else {
           for (const key in ruleValue) {
             const tmpRuleName = argName + OBJECT_SP + key;
-            childRules[tmpRuleName] = helper.extend({}, ruleChildren, {value: ruleValue[key]});
+            childRules[tmpRuleName] = helper.extend({}, ruleChildren, { value: ruleValue[key] });
           }
         }
       }
