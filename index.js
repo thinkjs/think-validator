@@ -36,9 +36,9 @@ class Validator {
     ];
     this.skippedValidNames = ['value', 'default', 'trim', 'method', 'aliasName'].concat(this.requiredValidNames);
     this.basicType = ['int', 'string', 'float', 'array', 'object', 'boolean'];
-    const confFilePath = ctx.app.think.APP_PATH + '/config/errors.js';
+    const confFilePath = (ctx.app && ctx.app.think && ctx.app.think.APP_PATH) ? ctx.app.think.APP_PATH + '/config/errors.js' : '';
     let confErrors = {};
-    if (helper.isFile(confFilePath)) {
+    if (confFilePath && helper.isFile(confFilePath)) {
       confErrors = require(confFilePath);
     }
     this.errors = helper.extend({}, preErrors, confErrors);
