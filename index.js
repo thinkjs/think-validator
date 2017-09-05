@@ -20,11 +20,8 @@ const METHOD_MAP = {
 };
 const preRules = require('./rules.js');
 const preErrors = require('./errors.js');
+let isLoadConf = false;
 let confErrors = {};
-const confFilePath = think.APP_PATH + '/config/errors.js';
-if (helper.isFile(confFilePath)) {
-  confErrors = require(confFilePath);
-}
 
 class Validator {
   constructor(ctx) {
@@ -41,7 +38,12 @@ class Validator {
     ];
     this.skippedValidNames = ['value', 'default', 'trim', 'method', 'aliasName'].concat(this.requiredValidNames);
     this.basicType = ['int', 'string', 'float', 'array', 'object', 'boolean'];
-    this.errors = helper.extend({}, preErrors ,confErrors);
+    const confFilePath = ctx.app.think.APP_PATH + '/config/errors.js';
+    let confErrors = {};
+    if (helper.isFile(confFilePath)) {
+      confErrors = require(confFilePath);
+    }
+    this.errors = helper.extend({}, preErrors, confErrors);
   }
 
   /**
